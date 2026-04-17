@@ -1,0 +1,90 @@
+h1
+{
+    color: blanchedalmond;
+    margin: 30px;
+    font-size:xx-large;
+}
+body
+{
+    background-color: black;
+}
+
+.maze
+{
+    padding-top: 50%;
+    color: white;
+    align-self: center;
+    font-size:x-large;
+    border-color: white;
+}
+
+.container
+{
+    border-color: white;
+    /* padding-top: 10%;
+    padding-left:20%; */
+    position: fixed;
+    top: 20%;
+    left: 40%;
+}
+
+
+#heading
+{
+    position:absolute;
+    padding-left: 45%;
+    font-size: xx-large;
+
+}
+
+#tutorial
+{
+    position: absolute;
+    margin-left: 90%;
+    padding: 0;
+    background: none;
+    border: none;
+    color: blanchedalmond;
+    font-size: xx-large;
+}
+
+.btn-close
+{
+    background-color:white;
+}
+
+.btn-secondary
+{
+    border-color: honeydew;
+}
+
+td
+{
+    text-align: center;
+    height:45px;
+    width:45px;
+    border-color: aliceblue;
+    border-width: 1px;
+
+    
+}
+
+.modal-title
+{
+    color: white;
+}
+
+
+.modal-content
+{
+    background-color: rgb(40, 41, 40);
+    color: white;
+}
+
+
+.resetButton
+{
+    position: relative;
+    margin-top: 60vh;
+    margin-left: 40vw;
+}
