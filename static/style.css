@@ -16,6 +16,7 @@ body
     align-self: center;
     font-size:x-large;
     border-color: white;
+    border: thin solid white;
 }
 
 .container
