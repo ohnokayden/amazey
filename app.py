@@ -161,7 +161,7 @@ def index():
         coords = request.get_json()
         if coords == "new map":
             print("sending new maze")
-            startEnd = createPerfectMaze(5,5)
+            startEnd = createPerfectMaze(10,10)
             mazeMap = startEnd[4:len(startEnd)-1]
             curPath = startEnd[len(startEnd) - 1]
             choosingList = json.dumps(checkPath(curPath[0],mazeMap,curPath))
@@ -202,7 +202,7 @@ def index():
         # check if user has completed the maze, the coords sent back is the ending one -> clear path and generate new maze
         # else check new path
     elif request.method == 'GET':
-        startEnd = createPerfectMaze(5,5)
+        startEnd = createPerfectMaze(10,10)
         mazeMap = startEnd[4:len(startEnd) - 1]
         curPath = startEnd[len(startEnd) - 1]
 
