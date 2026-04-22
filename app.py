@@ -211,7 +211,7 @@ def index():
         resp = make_response(render_template("index.html", mazeMap=mazeMap, choosingList=choosingList, startingCoords=startEnd[:2], endingCoords=startEnd[2:4]))
         key = json.dumps(mazeMap)
         resp.set_cookie("curMaze", key)
-        answers.update({f"{key}" : f"{curPath}"}) 
+        answers.update({key : f"{curPath}"}) 
         print(answers)
         return resp
 
