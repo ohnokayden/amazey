@@ -1,4 +1,5 @@
 from random import randint
+from time import time 
 
 import json
 from flask import Flask, render_template, request, jsonify, make_response
@@ -9,6 +10,7 @@ app = Flask(__name__)
 
 
 answers = {}
+# answers =  {cookie: {"answer": answer, "expiration": time + expiry_time(600)}}
 
 
 
@@ -210,14 +212,13 @@ def index():
     # curPath shld only be cleared once the indiv has finished the curMaze
         resp = make_response(render_template("index.html", mazeMap=mazeMap, choosingList=choosingList, startingCoords=startEnd[:2], endingCoords=startEnd[2:4]))
         key = json.dumps(mazeMap)
-        resp.set_cookie("curMaze", key)
+        resp.set_cookie("curMaze", key, max_age=600)
         answers.update({f"{key}" : f"{curPath}"}) 
         print(answers)
         return resp
 
 #TODO:
 
-# 1. expiration of cookie
+# 1. expiration of cookie -> set up a read of the dict, to get which answers/cookies have expired + set the cookie to expire (in 10 mins)
 # 2. error handling of no key found
-# 3. removal of the global variables-> transit to cookies
-# 4. set up of a venv
+# 3. removal of the global variables-> transit to cookies (need to update the dict to add in expiration time)
