@@ -12,7 +12,10 @@ app = Flask(__name__)
 answers = {}
 # answers =  {cookie: {"answer": answer, "expiration": time + expiry_time(600)}}
 
-
+def isExpiry(answerDict):
+    for x in answerDict:
+        if answerDict[x]["expiration"] < time.time:
+            return True # expired
 
 def createPerfectMaze(rows, cols):
     # 0 denotes a wall, 1 denotes a path
@@ -183,6 +186,8 @@ def index():
         if request.cookies.get("curMaze", "no cookie") is "no cookie":
             # cookie cannot be found-> reload page
             print("no cookie found")
+            # do not give points
+            # TODO: add solving algo?
             return jsonify(True)
         i = 0
         answer = True
