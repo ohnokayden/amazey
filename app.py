@@ -12,10 +12,13 @@ app = Flask(__name__)
 answers = {}
 # answers =  {cookie: {"answer": answer, "expiration": time + 600}}
 
-def isExpiry(answerDict):
+
+# upon a request sent back to the server for ending check or getting a new maze, check for any redundant cookies
+def checkExpiry(answerDict):
     for x in answerDict:
         if answerDict[x]["expiration"] < time.time:
-            return True # expired
+            answerDict.pop(x)
+
 
 def createPerfectMaze(rows, cols):
     # 0 denotes a wall, 1 denotes a path
@@ -186,11 +189,13 @@ def index():
         if request.cookies.get("curMaze", "no cookie") is "no cookie":
             # cookie cannot be found-> reload page
             print("no cookie found")
-            # TODO: add in a check for expried cookies and remove any
+            # check for expried cookies and remove any
+            checkExpiry(answers)
             return jsonify(True)
         i = 0
         answer = True
         curAnswer = json.loads(answers.get(request.cookies.get("curMaze")).get("answer")) 
+        checkExpiry(answers)
         # reads the cookies to get the maze, then looks in the dict for the corresponding answer
         print(curAnswer)
         
@@ -222,6 +227,7 @@ def index():
         answers.update({f"{key}" :{"answer" : f"{curPath}", "expiration" : time.time() + 600} })
         #  this stores the maze map as the key, and a dict containing the answer and the cookie expiration time as a key-value pair
         print(answers)
+        checkExpiry(answers)
         return resp
 
 #TODO:
