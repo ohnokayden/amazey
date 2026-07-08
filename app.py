@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 
 answers = {}
-# answers =  {cookie: {"answer": answer, "expiration": time + expiry_time(600)}}
+# answers =  {cookie: {"answer": answer, "expiration": time + 600}}
 
 def isExpiry(answerDict):
     for x in answerDict:
@@ -178,20 +178,20 @@ def index():
             print(answers)
             resp = make_response(jsonify(ls))
             key = json.dumps(mazeMap)
-            resp.set_cookie("curMaze", key)
-            answers.update({f"{key}" : f"{curPath}"})
+            resp.set_cookie("curMaze", key, max_age=600) # sets in the cookie directory, the maze map 
+            answers.update({f"{key}" :{"answer" : f"{curPath}", "expiration" : time.time() + 600} })
             return resp
             # check if coords == pathList
         print("ending check")
         if request.cookies.get("curMaze", "no cookie") is "no cookie":
             # cookie cannot be found-> reload page
             print("no cookie found")
-            # do not give points
-            # TODO: add solving algo?
+            # TODO: add in a check for expried cookies and remove any
             return jsonify(True)
         i = 0
         answer = True
-        curAnswer = json.loads(answers.get(request.cookies.get("curMaze"))) # reads the cookies to get the maze, then looks in the dict for the corresponding answer
+        curAnswer = json.loads(answers.get(request.cookies.get("curMaze")).get("answer")) 
+        # reads the cookies to get the maze, then looks in the dict for the corresponding answer
         print(curAnswer)
         
         for data in coords:
@@ -217,8 +217,10 @@ def index():
     # curPath shld only be cleared once the indiv has finished the curMaze
         resp = make_response(render_template("index.html", mazeMap=mazeMap, choosingList=choosingList, startingCoords=startEnd[:2], endingCoords=startEnd[2:4]))
         key = json.dumps(mazeMap)
-        resp.set_cookie("curMaze", key, max_age=600)
-        answers.update({f"{key}" : f"{curPath}"}) 
+        
+        resp.set_cookie("curMaze", key, max_age=600) # sets in the cookie directory, the maze map 
+        answers.update({f"{key}" :{"answer" : f"{curPath}", "expiration" : time.time() + 600} })
+        #  this stores the maze map as the key, and a dict containing the answer and the cookie expiration time as a key-value pair
         print(answers)
         return resp
 
