@@ -1,5 +1,5 @@
 from random import randint
-from time import time 
+import time 
 
 import json
 from flask import Flask, render_template, request, jsonify, make_response
@@ -16,7 +16,7 @@ answers = {}
 # upon a request sent back to the server for ending check or getting a new maze, check for any redundant cookies
 def checkExpiry(answerDict):
     for x in answerDict:
-        if answerDict[x]["expiration"] < time.time:
+        if answerDict[x]["expiration"] < time.time():
             answerDict.pop(x)
 
 
