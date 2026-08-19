@@ -186,7 +186,7 @@ def index():
             return resp
             # check if coords == pathList
         print("ending check")
-        if request.cookies.get("curMaze", "no cookie") is "no cookie":
+        if request.cookies.get("curMaze", "no cookie") == "no cookie":
             # cookie cannot be found-> reload page
             print("no cookie found")
             # check for expried cookies and remove any
@@ -229,9 +229,3 @@ def index():
         print(answers)
         checkExpiry(answers)
         return resp
-
-#TODO:
-
-# 1. expiration of cookie -> set up a read of the dict, to get which answers/cookies have expired + set the cookie to expire (in 10 mins)
-# 2. error handling of no key found
-# 3. removal of the global variables-> transit to cookies (need to update the dict to add in expiration time)
