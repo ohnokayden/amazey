@@ -1,4 +1,4 @@
-# YOUR PROJECT TITLE
+# AMAZEY
 #### Video Demo:  <https://youtu.be/vvRVvrsHjEw>
 
 #### Description:
@@ -8,6 +8,20 @@ My project is called mazey and the idea behind it is an automatic maze generator
 
 #### Python and backend
 This maze is generated, where first a blank slate, which is a 2d array is first generated, then a starting point is randomly generated using the random library. From there, I utilised a recursive function, called `choosePath`, where pathing of the maze is done recursively, where from one point, a direction is chosen and a path is created, from the new point, another random direction is chosen, this repeats until it can no longer, when the `checkValid` function returns `False` which is when it hits an outer wall or is met by a path already with an adjacent path. Since it is a perfect maze, there can be no loops and therefore, if 2 different branches were to meet, it would create a loop and no longer be perfect, therefore, such a restriction is necessary. After this, it would return to the caller function, which would then exhaust the other 3 directions in which it can go in a random order, eventually, the original caller function on the starting square would be called. Thus, creating the maze of the desired size. This is all done in python, which is then combined with the flask framework, in order to integrate it into a web app environment.
+
+`checkPath(curCoords, mazeMap, curPath)`\
+Given the current coordinate, this looks at the four adjacent cells in `mazeMap` and returns a list of the ones that are open paths (value `1`), excluding the cell the player just came from (`curPath[0]`). This is the list of "next possible moves" that gets sent to the front end so it knows which squares to highlight.
+
+#### Sessions, cookies and server-side validation
+Because the maze and the correct path are generated on the server, the answer can't be trusted to the client, so each browser session is tracked with a cookie:
+
+- Whenever a maze is generated (on a fresh page load, or a `"new map"` POST request), the server sets a `curMaze` cookie on the response containing the JSON-serialised `mazeMap`. This same JSON string is used as the key into a server-side `answers` dictionary.
+- The `answers` dictionary maps each `mazeMap` key to a dict of the form `{"answer": curPath, "expiration": time.time() + 600}`, i.e. the correct solution path for that maze plus a Unix timestamp 600 seconds (10 minutes) in the future.
+- When the player finishes a maze, the submitted coordinates are compared against `answers[<cookie value>]["answer"]` to validate the solution server-side, so the client can't just tell the server it won.
+- `checkExpiry(answerDict)` iterates over the `answers` dictionary and removes any entry whose `"expiration"` timestamp has passed. It's called after every request that reads or writes `answers` (new maze, ending check, and page load), so stale sessions are cleaned up opportunistically rather than on a timer.
+- If a request comes in without a recognised `curMaze` cookie (e.g. it expired or was never set), the server treats the ending check as invalid and returns `True` to prompt the front end to reload rather than crashing on a missing dictionary key.
+
+Known limitations: `answers` is an in-memory global, so it resets on server restart and won't work across multiple worker processes; and error handling for a missing/garbage cookie key is still minimal.
 
 
 #### HTML front end design and integration
@@ -44,4 +58,3 @@ This functions serves to refresh the whole maze when the user makes a big mistak
 
 `endTurn()`\
 This function is added to the end coordinates and used to send the answer for server side validation, preventing malicious users from contaminating the result, if the server returns the the answer is valid, it will then send the essential information for a new maze to be generated. The new maze is created using the `createElement` function and the required information is all parsed using `JSON.parse` and `.json` for the responses themselves. After the new maze is created, the old maze is removed and the new maze is added in its same position with the same class and id as the previous maze in the same container. Lastly, all required event listeners are created again, and then the `startPath` function is once again called for the new starting coordinate.
-
