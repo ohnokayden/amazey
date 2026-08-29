@@ -1,5 +1,5 @@
 from random import randint
-from time import time 
+import time 
 
 import json
 from flask import Flask, render_template, request, jsonify, make_response
@@ -10,12 +10,15 @@ app = Flask(__name__)
 
 
 answers = {}
-# answers =  {cookie: {"answer": answer, "expiration": time + expiry_time(600)}}
+# answers =  {cookie: {"answer": answer, "expiration": time + 600}}
 
-def isExpiry(answerDict):
+
+# upon a request sent back to the server for ending check or getting a new maze, check for any redundant cookies
+def checkExpiry(answerDict):
     for x in answerDict:
-        if answerDict[x]["expiration"] < time.time:
-            return True # expired
+        if answerDict[x]["expiration"] < time.time():
+            answerDict.pop(x)
+
 
 def createPerfectMaze(rows, cols):
     # 0 denotes a wall, 1 denotes a path
@@ -178,20 +181,22 @@ def index():
             print(answers)
             resp = make_response(jsonify(ls))
             key = json.dumps(mazeMap)
-            resp.set_cookie("curMaze", key)
-            answers.update({f"{key}" : f"{curPath}"})
+            resp.set_cookie("curMaze", key, max_age=600) # sets in the cookie directory, the maze map 
+            answers.update({f"{key}" :{"answer" : f"{curPath}", "expiration" : time.time() + 600} })
             return resp
             # check if coords == pathList
         print("ending check")
-        if request.cookies.get("curMaze", "no cookie") is "no cookie":
+        if request.cookies.get("curMaze", "no cookie") == "no cookie":
             # cookie cannot be found-> reload page
             print("no cookie found")
-            # do not give points
-            # TODO: add solving algo?
+            # check for expried cookies and remove any
+            checkExpiry(answers)
             return jsonify(True)
         i = 0
         answer = True
-        curAnswer = json.loads(answers.get(request.cookies.get("curMaze"))) # reads the cookies to get the maze, then looks in the dict for the corresponding answer
+        curAnswer = json.loads(answers.get(request.cookies.get("curMaze")).get("answer")) 
+        checkExpiry(answers)
+        # reads the cookies to get the maze, then looks in the dict for the corresponding answer
         print(curAnswer)
         
         for data in coords:
@@ -217,13 +222,10 @@ def index():
     # curPath shld only be cleared once the indiv has finished the curMaze
         resp = make_response(render_template("index.html", mazeMap=mazeMap, choosingList=choosingList, startingCoords=startEnd[:2], endingCoords=startEnd[2:4]))
         key = json.dumps(mazeMap)
-        resp.set_cookie("curMaze", key, max_age=600)
-        answers.update({f"{key}" : f"{curPath}"}) 
+        
+        resp.set_cookie("curMaze", key, max_age=600) # sets in the cookie directory, the maze map 
+        answers.update({f"{key}" :{"answer" : f"{curPath}", "expiration" : time.time() + 600} })
+        #  this stores the maze map as the key, and a dict containing the answer and the cookie expiration time as a key-value pair
         print(answers)
+        checkExpiry(answers)
         return resp
-
-#TODO:
-
-# 1. expiration of cookie -> set up a read of the dict, to get which answers/cookies have expired + set the cookie to expire (in 10 mins)
-# 2. error handling of no key found
-# 3. removal of the global variables-> transit to cookies (need to update the dict to add in expiration time)
