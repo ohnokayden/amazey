@@ -1,2 +1,3 @@
-Flask      
+Flask    
+gunicorn  
 # find out why pip is not working

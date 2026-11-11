@@ -15,11 +15,13 @@ answers = {}
 
 # upon a request sent back to the server for ending check or getting a new maze, check for any redundant cookies
 def checkExpiry(answerDict):
-    for x in answerDict:
-        if answerDict[x]["expiration"] < time.time():
-            answerDict.pop(x)
-
-
+    expired = [
+        x for x in answerDict
+        if answerDict[x]["expiration"] < time.time()
+    ]
+    for x in expired:
+        answerDict.pop(x)
+        
 def createPerfectMaze(rows, cols):
     # 0 denotes a wall, 1 denotes a path
     curPath = []
